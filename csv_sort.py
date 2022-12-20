@@ -1,6 +1,25 @@
 import csv
 from dict_sort import dicts_quick_sort, additional_sort
 
+cache_dictionary = {}
+
+
+def cache(cache_dict):
+    def _cache(func):
+        def inner(*args):
+            key_string = "___"
+            for arg in args:
+                key_string += f"{arg}_"
+            if key_string in cache_dict.keys():
+                return cache_dict[key_string]
+            else:
+                out_data = func(*args)
+                cache_dict[key_string] = out_data
+                return out_data
+
+        return inner
+    return _cache
+
 
 def select_sorted(in_data, sort_columns=["high"], limit=30, order='desc', filename='dump.csv'):
     """
@@ -12,6 +31,17 @@ def select_sorted(in_data, sort_columns=["high"], limit=30, order='desc', filena
     :param filename: file for sorted data
     :return: None
     """
+    out_data = dict_select(in_data, sort_columns, limit, order)
+    with open(filename, 'w', newline='') as dump:
+        field_names = out_data[0].keys()
+        writer = csv.DictWriter(dump, fieldnames=field_names)
+        writer.writeheader()
+        for coll in out_data:
+            writer.writerow(coll)
+
+
+@cache(cache_dictionary)
+def dict_select(in_data, sort_columns, limit, order):
     dicts_quick_sort(in_data, sort_columns[0])
     for i in range(1, len(sort_columns)):
         additional_sort(in_data, sort_columns[i], sort_columns[i-1])
@@ -21,11 +51,4 @@ def select_sorted(in_data, sort_columns=["high"], limit=30, order='desc', filena
         out_data = in_data[:limit]
     else:
         raise Exception("Incorrect order")
-    with open(filename, 'w', newline='') as dump:
-        field_names = out_data[0].keys()
-        writer = csv.DictWriter(dump, fieldnames=field_names)
-        writer.writeheader()
-        for coll in out_data:
-            writer.writerow(coll)
-
-
+    return out_data

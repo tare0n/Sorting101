@@ -1,5 +1,5 @@
 import csv
-from csv_sort import select_sorted
+from csv_sort import select_sorted, cache_dictionary
 
 
 def open_csv(filename):
@@ -9,5 +9,4 @@ def open_csv(filename):
     return data
 
 
-select_sorted(open_csv("all_stocks_5yr.csv"), sort_columns=['high'], limit=500)
-
+select_sorted(open_csv("all_stocks_5yr.csv"), sort_columns=['high'], limit=10)
