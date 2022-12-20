@@ -52,3 +52,34 @@ def dict_select(in_data, sort_columns, limit, order):
     else:
         raise Exception("Incorrect order")
     return out_data
+
+
+def get_by_date(in_data, date="2017-08-08", name="PCLN", filename='dump.csv'):
+    left = 0
+    right = len(in_data)
+    mid = (left+right)//2
+    while in_data[mid]['Name'] != name:
+        if in_data[mid]['Name'] < name:
+            left = mid
+            mid = (left+right)//2
+        else:
+            right = mid
+            mid = (left+right)//2
+        if right-left <= 1:
+            raise Exception("Name not found")
+    residue = right-left
+    while in_data[mid]['date'] != date:
+        if in_data[mid]['date'] > date:
+            mid -= residue
+        else:
+            mid += residue
+            residue //= 2
+        if residue < 1:
+            raise Exception("date not found")
+    out_data = in_data[mid]
+    with open(filename, 'w', newline='') as dump:
+        field_names = out_data.keys()
+        writer = csv.DictWriter(dump, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerow(out_data)
+

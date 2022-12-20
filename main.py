@@ -1,5 +1,5 @@
 import csv
-from csv_sort import select_sorted, cache_dictionary
+from csv_sort import select_sorted, cache_dictionary, get_by_date
 
 
 def open_csv(filename):
@@ -9,4 +9,5 @@ def open_csv(filename):
     return data
 
 
-select_sorted(open_csv("all_stocks_5yr.csv"), sort_columns=['high'], limit=10)
+#select_sorted(open_csv("all_stocks_5yr.csv"), sort_columns=['high'], limit=10)
+get_by_date(open_csv("all_stocks_5yr.csv"), date="2015-05-18", name="AAL", filename='dump.csv')
